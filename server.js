@@ -1,27 +1,22 @@
-'use strict';
-require('dotenv').config();
-const express = require('express');
+const express = require('express')
+const app = express()
 const cors = require('cors');
-const weatherData = require('./assets/whether.json');
-const axios = require('axios');
+require('dotenv').config();
+app.use(cors())
+const { response } = require('express');
+const weatherController = require('./controller/Weather.controller');
+const indexController = require('./controller/index.controller');
+const movieController = require('./controller/Movie.controller');
+const port = process.env.PORT;
 
-const server = express();
-server.use(cors());
+app.get('/', indexController);
 
-const PORT = process.env.PORT;
+app.get('/weather', weatherController);
 
-const movieHandler = require('./modules/Movie');
-server.get('/movie', movieHandler);
+app.get('/movie', movieController);
 
 
-const weatherHandler = require('./modules/Weather');
-server.get('/weather', weatherHandler);
-
-
-server.get('*', (req, res) => {
-    res.status(404).send('not found')
-})
-
-server.listen(PORT, () => {
-    console.log(`listtening on PORT ${PORT}`)
-})
+app.listen(port, () => {
+  console.log(`server start on port: ${port}`);
+}
+);
