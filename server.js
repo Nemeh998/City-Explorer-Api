@@ -1,44 +1,27 @@
-const express = require('express')
-const cors=require('cors')
-const superagent=require('superagent');
-//ad the data
-const weather=require('./assetes/weather.json')
-const app = express()
- // routes or endpoints
-app.get('/', function (req, res) {
-  res.send('Hello World')
+'use strict';
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const weatherData = require('./assets/whether.json');
+const axios = require('axios');
+
+const server = express();
+server.use(cors());
+
+const PORT = process.env.PORT;
+
+const movieHandler = require('./modules/Movie');
+server.get('/movie', movieHandler);
+
+
+const weatherHandler = require('./modules/Weather');
+server.get('/weather', weatherHandler);
+
+
+server.get('*', (req, res) => {
+    res.status(404).send('not found')
 })
-const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
-
-app.use(cors());
-
-app.get('/weather', (req, res) => {
-  try{
-  const wetherBitURl =`http://api.weatherbit.io/v2.0/forecast/daily?key=${WEATHER_API_KEY}&lat=${req.query.lat}&lon=${req.query.lon}`;
-//  console.log(wetherBitURl);
-superagent.get(wetherBitURl).then(weatherBitData =>{
-  const arrOfData=  weatherBitData.body.data.map(data => new Weather(data));
-  // res.send(data.body);
-  res.send(arrOfData);
-
-}).catch(error =>{
-  console.log(error);
-});
-  }catch(error){
-  const arrOfData=weather.data.map(data => new Weather(data));}
-res.send(arrOfData);
-// res.send('its work');
-});
-
-class Weather{
-  constructor(data){
-    this.date=data.valid_date;
-    this.description=data.weather.description;
-  }
-}
- // start sirver in port 3000
-
-
-
- app.listen(3001)
+server.listen(PORT, () => {
+    console.log(`listtening on PORT ${PORT}`)
+})
